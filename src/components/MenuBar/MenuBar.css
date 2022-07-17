@@ -1,0 +1,20 @@
+.menu-bar {
+    display: flex;
+    background-color: rgb(141, 97, 66);
+    height: 4rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-bar-spans {
+    padding: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bolder;
+    margin-right: 2rem;
+}
+
+.menu-bar-log-in-span {
+    flex-grow: 1;
+    text-align: right;
+}

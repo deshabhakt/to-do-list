@@ -1,0 +1,37 @@
+.tabs-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(206, 255, 192);
+
+}
+
+.tabs-div div {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    font-weight: bolder;
+    font-size: 1rem;
+}
+
+.selected-tab {
+    background-color: orange;
+    border-radius: 4rem;
+    /* border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem; */
+
+}
+
+.not-selected-ongoing-tab {
+    border-bottom-right-radius: 2rem;
+}
+
+.tabbed-layout {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding: 10px;
+    gap: 10px;
+    margin-top: 100px;
+}
