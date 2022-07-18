@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
-import getDummyData from '../../utils/DummyData'
 import getDateTimeStamp from '../../utils/GetTimeDate'
 
 import MenuBar from '../MenuBar/MenuBar'
@@ -11,6 +10,9 @@ import EditTaskModal from '../Modals/EditTaskModal'
 import CreateTaskModal from '../Modals/CreateTaskModal'
 
 import './App.css'
+import fetchDataFromServer from '../API-CallHandler/Tasks-API/FetchDataFromServer'
+import deleteTask from '../API-CallHandler/Tasks-API/deleteTask'
+import editTask from '../API-CallHandler/Tasks-API/editTask'
 
 function App() {
 	const [toEdit, setToEdit] = useState(false)
@@ -18,8 +20,7 @@ function App() {
 
 	const [createTask, setCreateTask] = useState(false)
 
-	const [completeTasks, setCompleteTasks] = useState()
-	const [inCompleteTasks, setInCompleteTasks] = useState()
+	const [tasks, setTasks] = useState()
 
 	const [selectedTab, setSelectedTab] = useState('ongoing')
 
@@ -34,15 +35,9 @@ function App() {
 			createdOn: getDateTimeStamp(),
 			id: Math.random(),
 		}
-		if (createdTask.completed) {
-			setCompleteTasks((prev) => {
-				return [newTask, ...prev]
-			})
-		} else {
-			setInCompleteTasks((prev) => {
-				return [newTask, ...prev]
-			})
-		}
+		setTasks((prev) => {
+			return [newTask, ...prev]
+		})
 	}
 
 	const selectedTabHandler = (tab) => {
@@ -53,131 +48,82 @@ function App() {
 		}
 	}
 
-	const editButtonClickHandler = (index = 0, id) => {
+	const editButtonClickHandler = (id) => {
 		setToEdit(true)
-		if (selectedTab === 'complete') {
-			setTaskToBeEdited({ taskData: completeTasks[index], index: index })
-		} else {
-			setTaskToBeEdited({
-				taskData: inCompleteTasks[index],
-				index: index,
-			})
-		}
+		const taskData = tasks.filter((ele, idx) => {
+			return ele._id === id
+		})[0]
+		console.log(taskData)
+		setTaskToBeEdited({ taskData })
 	}
 
 	const taskCompletionToggleHandler = (id, toggledState) => {
-		const date = new Date()
-		const newTimeStamp =
-			date.toLocaleDateString() +
-			' ' +
-			date.toLocaleTimeString().toUpperCase()
-		if (toggledState) {
-			const ele = inCompleteTasks.filter((e, idx) => {
-				if (e.id === id) {
-					e.completed = toggledState
-					e.lastModifiedOn = newTimeStamp
-					return true
-				}
-				return false
-			})[0]
-			setInCompleteTasks((prev) => {
+		const newTimeStamp = getDateTimeStamp()
+		editTask({ _id: id, completed: toggledState }).then(() => {
+			const ele = tasks.filter((e, idx) => {
+				return e._id === id
+			})
+			ele.completed = toggledState
+			ele.lastModifiedOn = newTimeStamp
+
+			setTasks((prev) => {
 				return prev.filter((e, idx) => {
-					return e.id === id ? false : e
+					return e._id !== id
 				})
 			})
-			setCompleteTasks((prev) => {
-				return [ele, ...prev]
-			})
-		} else {
-			const ele = completeTasks.filter((e, idx) => {
-				if (e.id === id) {
-					e.completed = toggledState
-					e.lastModifiedOn = newTimeStamp
-					return true
-				}
-				return false
-			})[0]
-			setCompleteTasks((prev) => {
-				return prev.filter((e, idx) => {
-					return e.id === id ? false : e
-				})
-			})
-			setInCompleteTasks((prev) => {
-				return [ele, ...prev]
-			})
-		}
+		})
 	}
 
-	const taskEditDoneHandler = (editedTask, index) => {
+	const taskEditDoneHandler = (editedTask) => {
 		setToEdit(false)
-		if (editedTask === undefined && index === undefined) {
+		if (editedTask === undefined) {
 			return
 		}
-		const date = new Date()
-		editedTask.lastModifiedOn =
-			date.toLocaleDateString() +
-			' ' +
-			date.toLocaleTimeString().toUpperCase()
+		editedTask.lastModifiedOn = getDateTimeStamp()
 
-		if (selectedTab === 'ongoing') {
-			const prevTask = inCompleteTasks[index]
-			if (prevTask.completed !== editedTask.completed) {
-				setCompleteTasks((prev) => {
-					return [editedTask, ...prev]
+		editTask(editedTask).then(() => {
+			setTasks((prev) => {
+				const newArr = prev.filter((ele, idx) => {
+					if (ele._id === editedTask._id) {
+						return ele.completed === editedTask.completed
+					}
+					return ele
 				})
-				setInCompleteTasks((prev) => {
+
+				return newArr.filter((ele, idx) => {
+					if (ele._id === editedTask._id) {
+						return editedTask
+					}
+					return ele
+				})
+			})
+		})
+	}
+
+	const deleteButtonClickHandler = (id) => {
+		deleteTask(id)
+			.then(() => {
+				setTasks((prev) => {
 					return prev.filter((ele, idx) => {
-						return ele.id !== editedTask.id
+						return ele._id !== id
 					})
 				})
-			} else {
-				setInCompleteTasks((prev) => {
-					return prev.map((ele, idx) => {
-						if (ele.id === editedTask.id) {
-							return editedTask
-						}
-						return ele
-					})
-				})
-			}
-		}
-		if (selectedTab === 'complete') {
-			const prevTask = completeTasks[index]
-			if (prevTask.completed !== editedTask.completed) {
-				setInCompleteTasks((prev) => {
-					return [editedTask, ...prev]
-				})
-				setCompleteTasks((prev) => {
-					return prev.filter((ele, idx) => {
-						return ele.id !== editedTask.id
-					})
-				})
-			} else {
-				setCompleteTasks((prev) => {
-					return prev.filter((ele, idx) => {
-						if (ele.id === editedTask.id) {
-							return editedTask
-						}
-						return ele
-					})
-				})
-			}
-		}
+			})
+			.catch((e) => {
+				console.log(e)
+			})
 	}
 
 	useEffect(() => {
-		const dummyData = getDummyData()
-		setCompleteTasks((prev) => {
-			return dummyData.filter((ele) => {
-				return ele.completed === true && ele
+		fetchDataFromServer(selectedTab)
+			.then((res) => {
+				setTasks((prev) => res?.data)
 			})
-		})
-		setInCompleteTasks((prev) => {
-			return dummyData.filter((ele) => {
-				return ele.completed === false && ele
+			.catch((e) => {
+				console.log(e)
 			})
-		})
-	}, [])
+	}, [selectedTab])
+
 	return (
 		<div className="App">
 			<div className="fixed-top-bar-items">
@@ -188,19 +134,18 @@ function App() {
 				/>
 			</div>
 			<TabbedLayout
-				tasksList={
-					selectedTab !== 'ongoing' ? completeTasks : inCompleteTasks
-				}
+				tasksList={tasks}
 				editButtonClickHandler={editButtonClickHandler}
+				deleteButtonClickHandler={deleteButtonClickHandler}
 				taskCompletionToggleHandler={taskCompletionToggleHandler}
 			/>
 			<motion.button
-				// initial={{ rotate: '90deg' }}
-				// animate={{ rotate: '0deg' }}
-				// transition={{ duration: 1 }}
-				// whileHover={{
-				// 	scale: 1.05,
-				// }}
+				initial={{ rotate: '45deg' }}
+				animate={{ rotate: '0deg' }}
+				transition={{ duration: 1 }}
+				whileHover={{
+					scale: 1.05,
+				}}
 				className="add-note-btn"
 				onClick={() => {
 					setCreateTask(true)
@@ -216,9 +161,6 @@ function App() {
 				<EditTaskModal
 					taskToBeEdited={taskToBeEdited}
 					taskEditDoneHandler={taskEditDoneHandler}
-					// modalToggleOff={() => {
-					// 	setToEdit(false)
-					// }}
 				/>
 			)}
 		</div>

@@ -19,6 +19,8 @@ const getDummyData = () => {
 			completed: i % 2 === 0 ? true : false,
 		})
 	}
+	dummyData[1].description =
+		'This is a description. This description is for task with title 2This is a description. This description is for task with title 2This is a description. This description is for task with title 2This is a description. This description is for task with title 2This is a description. This description is for task with title 2This is a description. This description is for task with title 2This is a description. This description is for task with title 2'
 	return dummyData
 }
 

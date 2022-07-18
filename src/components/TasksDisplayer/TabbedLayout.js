@@ -4,6 +4,7 @@ import './TabbedLayout.css'
 const TabbedLayout = ({
 	tasksList,
 	editButtonClickHandler,
+	deleteButtonClickHandler,
 	taskCompletionToggleHandler,
 }) => {
 	return (
@@ -12,10 +13,11 @@ const TabbedLayout = ({
 				{tasksList?.map((task, index) => {
 					return (
 						<TaskCard
-							key={task.id}
+							key={task._id}
 							task={task}
 							index={index}
 							editButtonClickHandler={editButtonClickHandler}
+							deleteButtonClickHandler={deleteButtonClickHandler}
 							taskCompletionToggleHandler={
 								taskCompletionToggleHandler
 							}

@@ -5,11 +5,14 @@ import './TaskCard.css'
 
 import editImage from '../../../utils/images/edit-button-favicon.png'
 import deleteImage from '../../../utils/images/delete-button-favicon.png'
+import checkedImage from '../../../utils/images/checked.png'
+import unCheckedImage from '../../../utils/images/unchecked.png'
 
 const TaskCard = ({
 	task,
-	editButtonClickHandler,
 	index,
+	editButtonClickHandler,
+	deleteButtonClickHandler,
 	taskCompletionToggleHandler,
 }) => {
 	const [animation, setAnimation] = useState({
@@ -38,6 +41,7 @@ const TaskCard = ({
 					task={task}
 					index={index}
 					editButtonClickHandler={editButtonClickHandler}
+					deleteButtonClickHandler={deleteButtonClickHandler}
 					taskCompletionToggleHandler={taskCompletionToggleHandler}
 				/>
 			</div>
@@ -49,22 +53,21 @@ const Checkbox = ({ task, taskCompletionToggleHandler }) => {
 	return (
 		<>
 			{task.completed ? (
-				<input
-					type="checkbox"
-					name={task.id}
-					checked
-					onChange={(e) => {
-						taskCompletionToggleHandler(task.id, e.target.checked)
+				<span
+					onClick={() => {
+						taskCompletionToggleHandler(task._id, false)
 					}}
-				/>
+				>
+					<img src={checkedImage} alt="checked-button" />
+				</span>
 			) : (
-				<input
-					type="checkbox"
-					name={task.id}
-					onChange={(e) => {
-						taskCompletionToggleHandler(task.id, e.target.checked)
+				<span
+					onClick={() => {
+						taskCompletionToggleHandler(task._id, true)
 					}}
-				/>
+				>
+					<img src={unCheckedImage} alt="un-checked-button" />
+				</span>
 			)}
 		</>
 	)
@@ -72,13 +75,14 @@ const Checkbox = ({ task, taskCompletionToggleHandler }) => {
 
 const Buttons = ({
 	task,
-	taskCompletionToggleHandler,
-	editButtonClickHandler,
 	index,
+	editButtonClickHandler,
+	deleteButtonClickHandler,
+	taskCompletionToggleHandler,
 }) => {
 	return (
 		<div className="buttons-div">
-			<span className="task-completed-task-edit-div">
+			<span>
 				<Checkbox
 					task={task}
 					taskCompletionToggleHandler={taskCompletionToggleHandler}
@@ -86,7 +90,7 @@ const Buttons = ({
 			</span>
 			<span
 				onClick={() => {
-					editButtonClickHandler(index, task.id)
+					editButtonClickHandler(task._id)
 				}}
 			>
 				<img src={editImage} alt="edit-button" />
@@ -94,7 +98,7 @@ const Buttons = ({
 
 			<span
 				onClick={() => {
-					editButtonClickHandler(index, task.id)
+					deleteButtonClickHandler(task._id)
 				}}
 			>
 				<img src={deleteImage} alt="delete-button" />

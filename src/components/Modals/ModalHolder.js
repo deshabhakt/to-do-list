@@ -18,11 +18,7 @@ const ModalHoder = (props) => {
 			<div
 				className="backdrop"
 				onClick={() => {
-					try {
-						props.taskHandler(undefined)
-					} catch {
-						props.taskHandler(undefined, undefined)
-					}
+					props.taskHandler(undefined)
 				}}
 			></div>
 			{props.children}

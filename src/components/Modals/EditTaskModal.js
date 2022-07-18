@@ -53,7 +53,7 @@ const EditTaskModal = ({ taskToBeEdited, taskEditDoneHandler }) => {
 					</button>
 					<button
 						onClick={() => {
-							taskEditDoneHandler(task, taskToBeEdited.index)
+							taskEditDoneHandler(task)
 						}}
 					>
 						Done
