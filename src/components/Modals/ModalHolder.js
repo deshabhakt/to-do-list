@@ -1,4 +1,7 @@
+import React from 'react'
+
 import { motion } from 'framer-motion'
+// import motion from '../../../node_modules/framer-motion/dist/es/index'
 
 import './ModalHolder.css'
 

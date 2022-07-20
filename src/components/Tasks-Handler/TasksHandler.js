@@ -14,16 +14,6 @@ import deleteTask from '../API-CallHandler/Tasks-API/deleteTask'
 import editTask from '../API-CallHandler/Tasks-API/editTask'
 import createTask from '../API-CallHandler/Tasks-API/createTask'
 
-const dummyTask = [
-	{
-		_id: Math.random(),
-		title: 'This is a dummy task',
-		description: '',
-		lastModifiedOn: getDateTimeStamp(),
-		createdOn: getDateTimeStamp(),
-	},
-]
-
 function TasksHandler({ token }) {
 	const [toEdit, setToEdit] = useState(false)
 	const [taskToBeEdited, setTaskToBeEdited] = useState({})
@@ -130,7 +120,7 @@ function TasksHandler({ token }) {
 		fetchDataFromServer(selectedTab, token)
 			.then((res) => {
 				setTasks((prev) => {
-					return res?.data?.tasks
+					return res.data.tasks
 				})
 			})
 			.catch((e) => {

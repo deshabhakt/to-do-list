@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React,{ useState } from 'react'
 import Button from '../../UI/Button/Button'
 import ModalHoder from './ModalHolder'
 

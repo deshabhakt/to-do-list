@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import MenuBar from '../components/MenuBar/MenuBar'
-import { Error, Verification } from '../Pages/UtilityPages/utilityPages'
 
 import Home from '../Pages/Home/Home'
 import About from '../Pages/About/About'
