@@ -3,7 +3,7 @@ import { SERVER_URL, HEADERS, TOKENS } from '../config'
 
 const AllowedChanges = ['title', 'description', 'completed', 'lastModifiedOn']
 
-const editTask = async (editedTask) => {
+const editTask = async (editedTask, token = '') => {
 	const changes = {}
 	const keys = Object.keys(editedTask)
 
@@ -18,11 +18,12 @@ const editTask = async (editedTask) => {
 	}
 
 	const url = SERVER_URL + 'tasks/' + payload._id
-	console.log(url)
 	try {
+		const TOKEN = token === '' ? TOKENS.deshabhakt : token
+
 		const data = await axios.patch(url, payload, {
 			headers: {
-				...HEADERS(TOKENS.deshabhakt),
+				...HEADERS(TOKEN),
 			},
 		})
 		return data

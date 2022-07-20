@@ -3,29 +3,39 @@ import { motion } from 'framer-motion'
 
 import getDateTimeStamp from '../../utils/GetTimeDate'
 
-import MenuBar from '../MenuBar/MenuBar'
 import Tabs from '../TasksDisplayer/Tabs'
 import TabbedLayout from '../TasksDisplayer/TabbedLayout'
 import EditTaskModal from '../Modals/EditTaskModal'
 import CreateTaskModal from '../Modals/CreateTaskModal'
 
-import './App.css'
-import fetchDataFromServer from '../API-CallHandler/Tasks-API/FetchDataFromServer'
+import './TasksHandler.css'
+import fetchDataFromServer from '../API-CallHandler/Tasks-API/fetchTasks'
 import deleteTask from '../API-CallHandler/Tasks-API/deleteTask'
 import editTask from '../API-CallHandler/Tasks-API/editTask'
+import createTask from '../API-CallHandler/Tasks-API/createTask'
 
-function App() {
+const dummyTask = [
+	{
+		_id: Math.random(),
+		title: 'This is a dummy task',
+		description: '',
+		lastModifiedOn: getDateTimeStamp(),
+		createdOn: getDateTimeStamp(),
+	},
+]
+
+function TasksHandler({ token }) {
 	const [toEdit, setToEdit] = useState(false)
 	const [taskToBeEdited, setTaskToBeEdited] = useState({})
 
-	const [createTask, setCreateTask] = useState(false)
+	const [isCreateTask, setIsCreateTask] = useState(false)
 
 	const [tasks, setTasks] = useState()
 
 	const [selectedTab, setSelectedTab] = useState('ongoing')
 
 	const taskCreateHandler = (createdTask) => {
-		setCreateTask(false)
+		setIsCreateTask(false)
 		if (createdTask === undefined) {
 			return
 		}
@@ -33,10 +43,11 @@ function App() {
 			...createdTask,
 			lastModifiedOn: getDateTimeStamp(),
 			createdOn: getDateTimeStamp(),
-			id: Math.random(),
 		}
-		setTasks((prev) => {
-			return [newTask, ...prev]
+		createTask(newTask, token).then(() => {
+			setTasks((prev) => {
+				return [{ ...newTask, _id: Math.random() }, ...prev]
+			})
 		})
 	}
 
@@ -53,13 +64,12 @@ function App() {
 		const taskData = tasks.filter((ele, idx) => {
 			return ele._id === id
 		})[0]
-		console.log(taskData)
 		setTaskToBeEdited({ taskData })
 	}
 
 	const taskCompletionToggleHandler = (id, toggledState) => {
 		const newTimeStamp = getDateTimeStamp()
-		editTask({ _id: id, completed: toggledState }).then(() => {
+		editTask({ _id: id, completed: toggledState }, token).then(() => {
 			const ele = tasks.filter((e, idx) => {
 				return e._id === id
 			})
@@ -81,27 +91,30 @@ function App() {
 		}
 		editedTask.lastModifiedOn = getDateTimeStamp()
 
-		editTask(editedTask).then(() => {
-			setTasks((prev) => {
-				const newArr = prev.filter((ele, idx) => {
-					if (ele._id === editedTask._id) {
-						return ele.completed === editedTask.completed
-					}
-					return ele
-				})
-
-				return newArr.filter((ele, idx) => {
-					if (ele._id === editedTask._id) {
-						return editedTask
-					}
-					return ele
-				})
+		editTask(editedTask, token)
+			.then(() => {
+				const previousTask = tasks.filter((ele, idx) => {
+					return ele._id === editedTask._id
+				})[0]
+				if (previousTask.completed === editedTask.completed) {
+					setTasks((prev) => {
+						return prev.filter((ele) => {
+							return ele._id === editedTask._id ? editedTask : ele
+						})
+					})
+				} else {
+					setTasks((prev) => {
+						return prev.filter((ele) => {
+							return ele._id !== editedTask._id
+						})
+					})
+				}
 			})
-		})
+			.catch((e) => console.log(e))
 	}
 
 	const deleteButtonClickHandler = (id) => {
-		deleteTask(id)
+		deleteTask(id, token)
 			.then(() => {
 				setTasks((prev) => {
 					return prev.filter((ele, idx) => {
@@ -113,31 +126,23 @@ function App() {
 				console.log(e)
 			})
 	}
-
 	useEffect(() => {
-		fetchDataFromServer(selectedTab)
+		fetchDataFromServer(selectedTab, token)
 			.then((res) => {
-				setTasks((prev) => res?.data)
+				setTasks((prev) => {
+					return res?.data?.tasks
+				})
 			})
 			.catch((e) => {
 				console.log(e)
 			})
-	}, [selectedTab])
+	}, [selectedTab, tasks, token])
 
 	return (
-		<div className="App">
-			<div className="fixed-top-bar-items">
-				<MenuBar />
-				<Tabs
-					selectedTabHandler={selectedTabHandler}
-					selectedTab={selectedTab}
-				/>
-			</div>
-			<TabbedLayout
-				tasksList={tasks}
-				editButtonClickHandler={editButtonClickHandler}
-				deleteButtonClickHandler={deleteButtonClickHandler}
-				taskCompletionToggleHandler={taskCompletionToggleHandler}
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
+			<Tabs
+				selectedTabHandler={selectedTabHandler}
+				selectedTab={selectedTab}
 			/>
 			<motion.button
 				initial={{ rotate: '45deg' }}
@@ -148,12 +153,12 @@ function App() {
 				}}
 				className="add-note-btn"
 				onClick={() => {
-					setCreateTask(true)
+					setIsCreateTask(true)
 				}}
 			>
 				+
 			</motion.button>
-			{createTask && (
+			{isCreateTask && (
 				<CreateTaskModal taskCreateHandler={taskCreateHandler} />
 			)}
 
@@ -163,8 +168,14 @@ function App() {
 					taskEditDoneHandler={taskEditDoneHandler}
 				/>
 			)}
+			<TabbedLayout
+				tasksList={tasks}
+				editButtonClickHandler={editButtonClickHandler}
+				deleteButtonClickHandler={deleteButtonClickHandler}
+				taskCompletionToggleHandler={taskCompletionToggleHandler}
+			/>
 		</div>
 	)
 }
 
-export default App
+export default TasksHandler

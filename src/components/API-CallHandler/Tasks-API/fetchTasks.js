@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { SERVER_URL, HEADERS, TOKENS } from '../config'
-const fetchDataFromServer = async (
+const fetchTasks = async (
 	isCompleted,
+	token = '',
 	limit = undefined,
 	skip = 10
 ) => {
@@ -9,13 +10,15 @@ const fetchDataFromServer = async (
 	let queryURL =
 		SERVER_URL +
 		'tasks?completed=' +
-		(isCompleted === 'ongoing' ? 'False' : 'True')
+		(isCompleted === 'ongoing' ? 'False' : 'True') +
+		'&sortBy=updatedAt:desc'
 	if (limit) {
 		queryURL += '&limit=' + limit + '&skip' + skip
 	}
 	try {
+		const TOKEN = token === '' ? TOKENS.deshabhakt : token
 		const data = await axios.get(queryURL, {
-			headers: HEADERS(TOKENS.deshabhakt),
+			headers: HEADERS(TOKEN),
 		})
 		return data
 	} catch (e) {
@@ -24,4 +27,4 @@ const fetchDataFromServer = async (
 	}
 }
 
-export default fetchDataFromServer
+export default fetchTasks

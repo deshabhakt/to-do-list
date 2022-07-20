@@ -1,28 +1,16 @@
-.App {
-    display: flex;
-    flex-direction: column;
-}
-
-.fixed-top-bar-items {
-    flex: 1 1;
-    width: 100%;
-    position: fixed;
-    z-index: 10;
-}
-
 .add-note-btn {
-    align-self: flex-end;
     position: fixed;
-    margin-top: 92vh;
-    margin-right: 1rem;
     z-index: 10;
     width: 50px;
     height: 50px;
     border-radius: 100%;
-    border: transparent;
+    border: 0;
     font-size: 2rem;
     color: rgb(251, 255, 0);
     background-color: rgb(33, 136, 34);
+    align-self: flex-end;
+    margin-right: 2vw;
+    margin-top: 82vh;
 }
 
 .add-note-btn:hover {
@@ -32,4 +20,16 @@
 
 .add-note-btn:active {
     background-color: deepskyblue;
+}
+
+@media screen and (max-width:800px) {
+    .add-note-btn {
+        margin-left: 85vw;
+    }
+}
+
+@media screen and (max-height:900px) {
+    .add-note-btn {
+        margin-top: 83vh;
+    }
 }

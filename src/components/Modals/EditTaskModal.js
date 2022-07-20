@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './Modal.css'
+import Button from '../../UI/Button/Button'
 import ModalHoder from './ModalHolder'
 
 const EditTaskModal = ({ taskToBeEdited, taskEditDoneHandler }) => {
@@ -38,8 +38,11 @@ const EditTaskModal = ({ taskToBeEdited, taskEditDoneHandler }) => {
 					onChange={taskEditHandler}
 				/>
 				<div className="task-completed-button">
-					<button
-						onClick={() => {
+					<Button
+						className={`btn ${
+							taskCompleted ? 'btn-danger' : 'btn-success'
+						}`}
+						onClickHandler={() => {
 							setTask((prev) => {
 								return {
 									...prev,
@@ -49,15 +52,16 @@ const EditTaskModal = ({ taskToBeEdited, taskEditDoneHandler }) => {
 							setTaskCompleted((prev) => !prev)
 						}}
 					>
-						{taskCompleted ? 'Completed?' : 'Not Complete?'}
-					</button>
-					<button
-						onClick={() => {
+						{!taskCompleted ? 'Completed?' : 'Not Complete?'}
+					</Button>
+					<Button
+						className={'btn btn-primary'}
+						onClickHandler={() => {
 							taskEditDoneHandler(task)
 						}}
 					>
 						Done
-					</button>
+					</Button>
 				</div>
 			</div>
 		</ModalHoder>

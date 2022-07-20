@@ -2,9 +2,8 @@ import { useState } from 'react'
 
 import ModalHoder from './ModalHolder'
 
-import './Modal.css'
-
 import getDateTimeStamp from '../../utils/GetTimeDate'
+import Button from '../../UI/Button/Button'
 
 const CreateTaskModal = ({ taskCreateHandler }) => {
 	const [newTask, setNewTask] = useState({
@@ -15,7 +14,6 @@ const CreateTaskModal = ({ taskCreateHandler }) => {
 		completed: false,
 	})
 	const keyStrokeHandler = (event) => {
-		console.log(event.key)
 		if (event.key === 'Escape') {
 			taskCreateHandler(undefined)
 		}
@@ -67,14 +65,18 @@ const CreateTaskModal = ({ taskCreateHandler }) => {
 					onChange={taskInputHandler}
 				/>
 				<div className="task-completed-button">
-					<button type="submit">Done</button>
-					<button
-						onClick={() => {
+					<Button
+						className={'btn btn-danger'}
+						type={'reset'}
+						onClickHandler={() => {
 							taskCreateHandler(undefined)
 						}}
 					>
 						Cancel
-					</button>
+					</Button>
+					<Button className={'btn btn-primary'} type={'submit'}>
+						Done
+					</Button>
 				</div>
 			</form>
 		</ModalHoder>
